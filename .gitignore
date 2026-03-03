@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+
+# LoRA / Model Weights (The likely culprits)
+*.safetensors
+*.ckpt
+*.bin
+*.pth
+*.onnx
+
+# Output directories
+outputs/
+checkpoints/
+runs/
+data/
+
+# Logs
+*.log
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Local Environment Variables
+.env
+
+# IDE Specific (Optional but recommended)
+.vscode/
+.idea/

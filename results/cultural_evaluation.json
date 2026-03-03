@@ -1,0 +1,18 @@
+{
+  "dsfs_score": 0.725,
+  "overall_cultural_accuracy": 0.72,
+  "per_category": {
+    "gulf_expression": {
+      "accuracy": 0.7,
+      "count": 10
+    },
+    "code_switch": {
+      "accuracy": 0.7,
+      "count": 10
+    },
+    "culturally_ambiguous": {
+      "accuracy": 0.8,
+      "count": 5
+    }
+  }
+}

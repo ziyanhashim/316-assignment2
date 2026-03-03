@@ -1,0 +1,9 @@
+Metric,Full Fine-Tuning,LoRA (PEFT)
+Accuracy,0.7105,0.8920
+F1 (Macro),0.6345,0.8606
+Precision,0.6555,0.8627
+Recall,0.6255,0.8591
+Training Time (min),73.1,190.1
+Peak GPU (GB),12.60,15.45
+Trainable Params,"302,569,600","13,387,776"
+Trainable %,21.86%,0.9578%

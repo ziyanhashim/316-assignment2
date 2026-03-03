@@ -1,0 +1,26 @@
+text,label,category,note,text_clean,predicted,correct,confidence
+الله يعطيك العافيه,2,gulf_expression,Blessing/gratitude,الله يعطيك العافيه,2,True,0.7785053
+يا زين هالشي,2,gulf_expression,Gulf praise,يا زين هالشي,2,True,0.47483602
+وايد حلو صراحه,2,gulf_expression,Gulf intensifier,وايد حلو صراحه,0,False,0.49120337
+صج مو زين هالشي,0,gulf_expression,Gulf negation,صج مو زين هالشي,0,True,0.74013835
+ما عليه بس مو حلو,0,gulf_expression,Understatement,ما عليه بس مو حلو,0,True,0.95236415
+ما شاء الله عليك يا حظك,2,gulf_expression,Religious admiration,ما شاء الله عليك يا حظك,2,True,0.68706954
+خل نشوف شنو يصير,1,gulf_expression,Neutral,خل نشوف شنو يصير,0,False,0.6677539
+الله يهديك بس,0,gulf_expression,Mild disapproval,الله يهديك بس,2,False,0.5036995
+تبارك الرحمن عليك,2,gulf_expression,Religious praise,تبارك الرحمن عليك,2,True,0.68152833
+شنو هالسالفه يا ربي,0,gulf_expression,Exasperation,شنو هالسالفه يا ربي,0,True,0.6822486
+This is amazing والله ما توقعت,2,code_switch,EN praise + AR,This is amazing والله ما توقعت,2,True,0.7894618
+هالمكان so overrated صدق,0,code_switch,AR + EN criticism,هالمكان so overrated صدق,0,True,0.98314893
+Not bad بس مو best option يعني,1,code_switch,Lukewarm,Not bad بس مو best option يعني,0,False,0.96787864
+I love هالمطعم the food is وايد amazing,2,code_switch,Heavy code-switch pos,I love هالمطعم the food is وايد amazing,2,True,0.8634026
+Terrible service والله ما انصح ابدا never again,0,code_switch,Bilingual negative,Terrible service والله ما انصح ابدا never again,0,True,0.9995478
+The new update خرب كل شي everything is broken,0,code_switch,Technical complaint,The new update خرب كل شي everything is broken,0,True,0.9987882
+Pretty good بس يبي improvement شوي,1,code_switch,Constructive criticism,Pretty good بس يبي improvement شوي,0,False,0.8611678
+Honestly صدق this place deserves all the hype يستاهل,2,code_switch,Emphatic positive,Honestly صدق this place deserves all the hype يستاهل,2,True,0.60166353
+So disappointed مع هالخدمه worst experience,0,code_switch,Emotional negative,So disappointed مع هالخدمه worst experience,0,True,0.99936396
+هل anyone tried this يعرف if it's worth it,1,code_switch,Neutral question,هل anyone tried this يعرف if it's worth it,0,False,0.8726037
+الله يعينك على هالشغله,0,culturally_ambiguous,Implies difficulty,الله يعينك علي هالشغله,0,True,0.5059113
+تبارك الله شو هالجمال يا سلام,2,culturally_ambiguous,Genuine praise,تبارك الله شو هالجمال يا سلام,2,True,0.7762381
+مشكور على هالسيرفس الرهيب,0,culturally_ambiguous,Sarcastic thanks,مشكور علي هالسيرفس الرهيب,2,False,0.49008816
+والله احسن شي سويته ما قصرت,0,culturally_ambiguous,Sarcastic,والله احسن شي سويته ما قصرت,0,True,0.7426321
+يعطيك الف عافيه على المجهود,2,culturally_ambiguous,Genuine gratitude,يعطيك الف عافيه علي المجهود,2,True,0.69463325

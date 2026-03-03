@@ -52,7 +52,7 @@ if not hasattr(_pu, "find_pruneable_heads_and_indices"):
 
 def main():
     print("=" * 60)
-    print("STRATEGY 1: Full Fine-Tuning with DeepSpeed ZeRO-2")
+    print("STRATEGY 1: Progressive Layer Unfreezing")
     print("=" * 60)
 
     # ----------------------------------------------------------
@@ -85,11 +85,24 @@ def main():
         ignore_mismatched_sizes=True,
     )
     model.config.pad_token_id = tokenizer.pad_token_id
+    # Without DeepSpeed, freeze early layers to fit in 16 GB VRAM
+    for param in model.parameters():
+        param.requires_grad = False
 
+    UNFREEZE_LAST_N = 6
+    total_layers = 24
+    for name, param in model.named_parameters():
+        if 'score' in name or 'ln_f' in name:
+            param.requires_grad = True
+        else:
+            for layer_idx in range(total_layers - UNFREEZE_LAST_N, total_layers):
+                if f'.h.{layer_idx}.' in name or f'.layers.{layer_idx}.' in name:
+                    param.requires_grad = True
+                    break
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Total parameters:     {total_params:,}")
-    print(f"Trainable parameters: {trainable_params:,} (100%)")
+    print(f"Trainable parameters: {trainable_params:,} ({trainable_params/total_params*100:.2f}%)")
 
     # ----------------------------------------------------------
     # 3. Sanity check (20 steps)
@@ -106,7 +119,6 @@ def main():
         report_to="none",
         seed=SEED,
         save_strategy="no",
-        deepspeed=DEEPSPEED_CONFIG if os.path.exists(DEEPSPEED_CONFIG) else None,
     )
     sanity_trainer = Trainer(
         model=model, args=sanity_args, train_dataset=train_dataset
@@ -150,7 +162,6 @@ def main():
         data_seed=SEED,
         optim="adamw_torch",
         lr_scheduler_type="cosine",
-        deepspeed=DEEPSPEED_CONFIG if os.path.exists(DEEPSPEED_CONFIG) else None,
     )
 
     trainer = Trainer(
@@ -228,8 +239,8 @@ def main():
         "peak_gpu_memory_gb": ft_memory,
         "total_params": total_params,
         "trainable_params": trainable_params,
-        "trainable_percent": 100.0,
-        "strategy": "Full Fine-Tuning (DeepSpeed ZeRO-2 + CPU Offload)",
+        "trainable_percent": trainable_params / total_params * 100,
+        "strategy": "Progressive Layer Unfreezing (last 6/24 layers)",
     }
     with open(os.path.join(RESULTS_DIR, "full_ft_results.json"), "w") as f:
         json.dump(results, f, indent=2)
