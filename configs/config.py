@@ -3,7 +3,6 @@ CSCI316 Project 2 — Configuration Constants
 Group: big_boyz
 """
 import os
-import torch
 
 # ============================================================
 # Paths — Local PC setup (no Google Drive / Colab)
@@ -48,5 +47,9 @@ LORA_DROPOUT = 0.1
 # ============================================================
 # Device
 # ============================================================
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def get_device():
+    import torch
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+DEVICE = None  # Call get_device() when torch is available
 SEED = 42

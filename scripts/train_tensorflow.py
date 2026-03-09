@@ -3,7 +3,7 @@ CSCI316 Project 2 — TensorFlow/Keras Implementation
 Group: big_boyz
 
 Same pipeline as PyTorch: Gulf Arabic Sentiment Analysis.
-Uses BLOOM-560M (multilingual, 46 languages including Arabic) since
+Uses XLM-RoBERTa-base (multilingual, 100 languages including Arabic) since
 Jais requires custom PyTorch code incompatible with TensorFlow.
 
 The spec requires implementing the same pipeline in both frameworks
@@ -28,6 +28,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Add pip-installed cuDNN DLLs to PATH for TF GPU on Windows
+try:
+    import nvidia.cudnn
+    _cudnn = os.path.join(nvidia.cudnn.__path__[0], "bin")
+    os.environ["PATH"] = _cudnn + os.pathsep + os.environ.get("PATH", "")
+except ImportError:
+    pass
+
+
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 import tensorflow as tf
 from tensorflow import keras
@@ -40,7 +49,7 @@ from configs.config import DATA_DIR, RESULTS_DIR, CHECKPOINT_DIR, SEED, MAX_LENG
 
 NUM_LABELS = 3
 LABEL_MAP = {0: "Negative", 1: "Neutral", 2: "Positive"}
-TF_MODEL_NAME = "bigscience/bloom-560m"
+TF_MODEL_NAME = "xlm-roberta-base"
 TF_BATCH_SIZE = 8
 TF_EPOCHS = 3
 TF_LEARNING_RATE = 2e-5
@@ -112,10 +121,6 @@ def main():
     from transformers import AutoTokenizer, TFAutoModel
 
     tokenizer = AutoTokenizer.from_pretrained(TF_MODEL_NAME)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-        tokenizer.pad_token_id = tokenizer.eos_token_id
-
     base_model = TFAutoModel.from_pretrained(TF_MODEL_NAME)
     print("Model loaded.")
 
@@ -142,13 +147,7 @@ def main():
     attention_mask = keras.layers.Input(shape=(MAX_LENGTH,), dtype=tf.int32, name="attention_mask")
 
     outputs = base_model(input_ids=input_ids, attention_mask=attention_mask)
-    hidden_state = outputs.last_hidden_state
-
-    # Mean pooling over non-padded tokens
-    mask_expanded = tf.cast(tf.expand_dims(attention_mask, -1), tf.float32)
-    pooled = tf.reduce_sum(hidden_state * mask_expanded, axis=1) / tf.maximum(
-        tf.reduce_sum(mask_expanded, axis=1), 1e-9
-    )
+    pooled = outputs.last_hidden_state[:, 0, :]  # CLS token
 
     # Classification head
     x = keras.layers.Dense(256, activation="gelu", name="cls_hidden")(pooled)
@@ -158,7 +157,7 @@ def main():
     model = keras.Model(inputs=[input_ids, attention_mask], outputs=logits)
 
     # Unfreeze last 2 transformer blocks
-    blocks = base_model.transformer.h if hasattr(base_model, "transformer") else base_model.h
+    blocks = base_model.roberta.encoder.layer
     total_blocks = len(blocks)
     for i, block in enumerate(blocks):
         if i >= total_blocks - 2:
@@ -170,7 +169,7 @@ def main():
     print(f"Trainable parameters: {trainable:,} ({trainable/total*100:.2f}%)")
 
     # Compile
-    optimizer = keras.optimizers.AdamW(learning_rate=TF_LEARNING_RATE, weight_decay=0.01)
+    optimizer = keras.optimizers.Adam(learning_rate=TF_LEARNING_RATE)
     model.compile(
         optimizer=optimizer,
         loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -188,7 +187,7 @@ def main():
     callbacks = [
         MetricsCallback(val_dataset, val_df["label_std"].values),
         keras.callbacks.ModelCheckpoint(
-            os.path.join(tf_ckpt_dir, "best_model.keras"),
+            os.path.join(tf_ckpt_dir, "best_model.h5"),
             monitor="val_loss", save_best_only=True, verbose=1,
         ),
         keras.callbacks.EarlyStopping(
@@ -232,7 +231,7 @@ def main():
     sns.heatmap(cm, annot=True, fmt="d", cmap="Greens",
                 xticklabels=[LABEL_MAP[i] for i in range(NUM_LABELS)],
                 yticklabels=[LABEL_MAP[i] for i in range(NUM_LABELS)], ax=ax)
-    ax.set_title("Confusion Matrix — TensorFlow/Keras (BLOOM-560M)", fontsize=14, fontweight="bold")
+    ax.set_title("Confusion Matrix — TensorFlow/Keras (XLM-RoBERTa-base)", fontsize=14, fontweight="bold")
     ax.set_xlabel("Predicted"); ax.set_ylabel("Actual")
     plt.tight_layout()
     plt.savefig(os.path.join(RESULTS_DIR, "confusion_matrix_tf.png"), dpi=150)
@@ -256,7 +255,7 @@ def main():
         "recall": float(test_rec),
         "training_time_seconds": tf_time,
         "epochs_trained": len(history.history["loss"]),
-        "strategy": "Selective Layer Unfreezing (last 2/24 blocks) + Classification Head",
+        "strategy": "Selective Layer Unfreezing (last 2/12 blocks) + Classification Head",
     }
     with open(os.path.join(RESULTS_DIR, "tf_results.json"), "w") as f:
         json.dump(tf_results, f, indent=2)
@@ -276,7 +275,7 @@ def main():
                 f"{pt_lora['precision']:.4f}", f"{pt_lora['recall']:.4f}",
                 f"{pt_lora['training_time_seconds']/60:.1f}",
             ],
-            "TF/Keras (BLOOM-560M)": [
+            "TF/Keras (XLM-RoBERTa-base)": [
                 f"{test_acc:.4f}", f"{test_f1:.4f}",
                 f"{test_prec:.4f}", f"{test_rec:.4f}",
                 f"{tf_time/60:.1f}",

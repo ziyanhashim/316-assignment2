@@ -1,0 +1,11 @@
+{
+  "framework": "TensorFlow/Keras",
+  "model": "xlm-roberta-base",
+  "accuracy": 0.6792575708238359,
+  "f1": 0.623447876321902,
+  "precision": 0.642420392310887,
+  "recall": 0.6131076050194887,
+  "training_time_seconds": 1322.0931675434113,
+  "epochs_trained": 3,
+  "strategy": "Selective Layer Unfreezing (last 2/12 blocks) + Classification Head"
+}
