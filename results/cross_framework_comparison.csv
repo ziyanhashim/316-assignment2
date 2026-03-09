@@ -1,0 +1,6 @@
+Metric,PyTorch LoRA (Jais-1.3B),TF/Keras (XLM-RoBERTa-base)
+Accuracy,0.8920,0.6793
+F1,0.8606,0.6234
+Precision,0.8627,0.6424
+Recall,0.8591,0.6131
+Time (min),190.1,22.0
