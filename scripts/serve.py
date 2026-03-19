@@ -13,23 +13,40 @@ import torch
 from flask import Flask, request, jsonify
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from peft import PeftModel
+from huggingface_hub import snapshot_download
 
 from configs.config import MODEL_NAME, NUM_LABELS, LABEL_MAP, MAX_LENGTH, CHECKPOINT_DIR
 from scripts.utils import preprocess_text
 
 app = Flask(__name__)
 
+# HuggingFace Hub repo for the LoRA adapter (public)
+HF_LORA_REPO = "ziyanhashim/jais-lora-gulf-arabic-sentiment"
+
 # Load model at startup
 print("Loading model...")
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
+hf_token = os.environ.get("HF_TOKEN")
+if not hf_token:
+    print("WARNING: HF_TOKEN not set. The base model inceptionai/jais-family-1p3b is gated and requires authentication.")
+    print("Set HF_TOKEN via: docker run -e HF_TOKEN=hf_xxx ...")
+
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True, token=hf_token)
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 
 lora_path = os.path.join(CHECKPOINT_DIR, "jais_lora_best")
+
+# If local checkpoint doesn't exist, download from HuggingFace Hub
+if not os.path.exists(lora_path):
+    print(f"Local checkpoint not found at {lora_path}")
+    print(f"Downloading LoRA adapter from {HF_LORA_REPO}...")
+    snapshot_download(repo_id=HF_LORA_REPO, local_dir=lora_path, token=hf_token)
+    print(f"Downloaded LoRA adapter to {lora_path}")
+
 if os.path.exists(lora_path):
     base = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME, num_labels=NUM_LABELS, torch_dtype=torch.float32,
-        trust_remote_code=True, ignore_mismatched_sizes=True
+        trust_remote_code=True, ignore_mismatched_sizes=True, token=hf_token
     )
     model = PeftModel.from_pretrained(base, lora_path)
     print("Loaded LoRA model")
@@ -37,7 +54,7 @@ else:
     model = AutoModelForSequenceClassification.from_pretrained(
         os.path.join(CHECKPOINT_DIR, "jais_full_finetune_best"),
         num_labels=NUM_LABELS, torch_dtype=torch.float32,
-        trust_remote_code=True,
+        trust_remote_code=True, token=hf_token,
     )
     print("Loaded full fine-tuned model")
 

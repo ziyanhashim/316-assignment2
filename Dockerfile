@@ -11,16 +11,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+# Copy project code (model downloads at startup from HuggingFace Hub)
 COPY configs/ configs/
 COPY scripts/ scripts/
-COPY checkpoints/ checkpoints/
 
 # Expose API port
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s CMD curl -f http://localhost:5000/health || exit 1
+# Health check (python:3.10-slim doesn't include curl)
+HEALTHCHECK --start-period=300s --interval=30s --timeout=10s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')" || exit 1
 
-# Run inference API
+# HF_TOKEN is passed at runtime: docker run -e HF_TOKEN=xxx ...
 CMD ["python", "scripts/serve.py"]
