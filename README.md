@@ -147,10 +147,18 @@ python scripts/evaluate.py
 
 ## Docker Deployment
 
+Deploy the inference API without training — the LoRA adapter downloads automatically from [HuggingFace Hub](https://huggingface.co/ziyanhashim/jais-lora-gulf-arabic-sentiment).
+
+**Prerequisites:**
+- A HuggingFace account with access to the gated [Jais-1.3B](https://huggingface.co/inceptionai/jais-family-1p3b) base model
+- A HuggingFace access token (`HF_TOKEN`) — generate one at https://huggingface.co/settings/tokens
+
 ### Build and Run
 
 ```bash
 docker build -t big_boyz_sentiment .
+
+# First run downloads ~2.7 GB of model weights
 docker run -p 5000:5000 -e HF_TOKEN=your_token_here big_boyz_sentiment
 ```
 
@@ -174,6 +182,8 @@ curl -X POST http://localhost:5000/predict \
 ```
 
 **Health check:** Visit http://localhost:5000/health in your browser.
+
+> **Note:** The first startup takes several minutes while model weights download. Subsequent runs reuse cached weights if the container is restarted (not rebuilt).
 
 ### API Endpoints
 
