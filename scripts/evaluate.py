@@ -1,6 +1,6 @@
 """
-CSCI316 Project 2 — Step 4: Evaluation, Comparison & Cultural Analysis
-Run AFTER both training scripts have completed.
+Compares the full fine-tuning vs LoRA results, runs the cultural evaluation
+(DSFS score), and does qualitative error analysis. Run this after training.
 
 Run: python scripts/evaluate.py
 """

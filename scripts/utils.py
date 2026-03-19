@@ -1,6 +1,5 @@
 """
-CSCI316 Project 2 — Utility Functions
-Preprocessing, metrics, seed management.
+Shared helpers — text preprocessing, evaluation metrics, and seed management.
 """
 import os
 import re

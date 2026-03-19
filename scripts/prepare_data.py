@@ -1,6 +1,7 @@
 """
-CSCI316 Project 2 — Step 1: Data Loading & Preprocessing
-Downloads datasets, cleans text, creates train/val/test splits.
+Downloads the Arabic sentiment datasets, cleans and preprocesses the text,
+then splits everything into train/val/test CSVs.
+
 Run: python scripts/prepare_data.py
 """
 import sys

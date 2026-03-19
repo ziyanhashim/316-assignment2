@@ -1,13 +1,7 @@
 """
-CSCI316 Project 2 — TensorFlow/Keras Implementation
-Group: big_boyz
-
-Same pipeline as PyTorch: Gulf Arabic Sentiment Analysis.
-Uses XLM-RoBERTa-base (multilingual, 100 languages including Arabic) since
-Jais requires custom PyTorch code incompatible with TensorFlow.
-
-The spec requires implementing the same pipeline in both frameworks
-to demonstrate understanding of framework-specific transfer learning APIs.
+TensorFlow/Keras version of the sentiment pipeline using XLM-RoBERTa-base.
+We can't use Jais here because it relies on custom PyTorch ops, so we use
+XLM-RoBERTa (multilingual, covers Arabic) as the cross-framework comparison.
 
 Run: python scripts/train_tensorflow.py
 """

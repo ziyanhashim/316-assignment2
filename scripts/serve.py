@@ -1,6 +1,6 @@
 """
-CSCI316 Project 2 — Inference API (Flask)
-Serves the fine-tuned Jais model for sentiment prediction.
+Flask API that serves the fine-tuned Jais model for sentiment predictions.
+This is what runs inside the Docker container.
 
 Run: python scripts/serve.py
 """
@@ -19,6 +19,7 @@ from configs.config import MODEL_NAME, NUM_LABELS, LABEL_MAP, MAX_LENGTH, CHECKP
 from scripts.utils import preprocess_text
 
 app = Flask(__name__)
+app.json.ensure_ascii = False
 
 # HuggingFace Hub repo for the LoRA adapter (public)
 HF_LORA_REPO = "ziyanhashim/jais-lora-gulf-arabic-sentiment"
@@ -83,12 +84,8 @@ def predict():
 
     return jsonify({
         "text": text,
-        "preprocessed": cleaned,
         "sentiment": LABEL_MAP[pred],
-        "confidence": float(probs[pred]),
-        "probabilities": {
-            LABEL_MAP[i]: float(probs[i]) for i in range(NUM_LABELS)
-        },
+        "confidence": round(float(probs[pred]), 4),
     })
 
 

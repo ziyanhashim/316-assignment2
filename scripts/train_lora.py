@@ -1,6 +1,6 @@
 """
-CSCI316 Project 2 — Strategy 2: LoRA (PEFT) Fine-Tuning
-Low-Rank Adaptation — trains ~0.5% of parameters.
+LoRA fine-tuning — injects small trainable adapters into the attention layers
+so we only update ~1% of the parameters instead of the full 1.3B.
 
 Run:  python scripts/train_lora.py
   OR: deepspeed scripts/train_lora.py

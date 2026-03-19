@@ -1,6 +1,5 @@
 """
-CSCI316 Project 2 — Configuration Constants
-Group: big_boyz
+All the hyperparameters, paths, and settings for the project live here.
 """
 import os
 

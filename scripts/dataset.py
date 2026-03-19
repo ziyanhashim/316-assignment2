@@ -1,5 +1,5 @@
 """
-CSCI316 Project 2 — PyTorch Dataset Class
+PyTorch Dataset wrapper for loading the sentiment data into DataLoaders.
 """
 import torch
 from torch.utils.data import Dataset

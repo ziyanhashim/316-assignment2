@@ -22,5 +22,5 @@ EXPOSE 5000
 HEALTHCHECK --start-period=300s --interval=30s --timeout=10s \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')" || exit 1
 
-# HF_TOKEN is passed at runtime: docker run -e HF_TOKEN=xxx ...
+# HF_TOKEN is loaded from .env file: docker run --env-file .env ...
 CMD ["python", "scripts/serve.py"]

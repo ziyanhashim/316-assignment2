@@ -1,6 +1,6 @@
 """
-CSCI316 Project 2 — Strategy 1: Full Fine-Tuning (All 1.3B Parameters)
-Uses DeepSpeed ZeRO Stage 2 + CPU Offloading to fit on 16 GB GPU.
+Fine-tunes the full Jais-1.3B model by unfreezing the last 6 transformer layers.
+Uses DeepSpeed ZeRO-2 with CPU offloading so it fits on a 16 GB GPU.
 
 Run:  deepspeed scripts/train_full_finetune.py
   OR: python scripts/train_full_finetune.py  (falls back to standard Trainer)

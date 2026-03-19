@@ -153,32 +153,37 @@ Deploy the inference API without training — the LoRA adapter downloads automat
 - A HuggingFace account with access to the gated [Jais-1.3B](https://huggingface.co/inceptionai/jais-family-1p3b) base model
 - A HuggingFace access token (`HF_TOKEN`) — generate one at https://huggingface.co/settings/tokens
 
+### Set Up Token
+
+Create a `.env` file in the project root:
+```bash
+echo "HF_TOKEN=your_token_here" > .env
+```
+
 ### Build and Run
 
 ```bash
 docker build -t big_boyz_sentiment .
 
 # First run downloads ~2.7 GB of model weights
-docker run -p 5000:5000 -e HF_TOKEN=your_token_here big_boyz_sentiment
+docker run -p 5000:5000 --env-file .env big_boyz_sentiment
 ```
 
 ### Test the API
 
-**Command Prompt (Windows):**
+Run the test script against all 25 cultural evaluation sentences in `test_sentences.json`:
+
 ```bash
-curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -d "{\"text\": \"this restaurant is amazing\"}"
+python scripts/test_api.py
 ```
 
-**PowerShell (Windows):**
-```powershell
-Invoke-WebRequest -Uri http://localhost:5000/predict -Method POST -ContentType "application/json" -Body '{"text": "this restaurant is amazing"}'
-```
+This reads each sentence from the file, sends it to the API, and compares the predicted sentiment against the expected label — showing PASS/FAIL, the English meaning, and confidence for each.
 
-**Linux/Mac:**
+**Or test a single sentence manually:**
 ```bash
 curl -X POST http://localhost:5000/predict \
   -H "Content-Type: application/json" \
-  -d '{"text": "هالمطعم وايد حلو the food is amazing"}'
+  -d "{\"text\": \"هالمطعم وايد حلو the food is amazing\"}"
 ```
 
 **Health check:** Visit http://localhost:5000/health in your browser.
